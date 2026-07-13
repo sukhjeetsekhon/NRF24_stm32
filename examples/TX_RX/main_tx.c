@@ -22,8 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <string.h>
-#include "NRF24.h"
-#include "NRF24_reg_addresses.h"
+#include "nrf24.h"
+#include "nrf24_registers.h"
 
 /* USER CODE END Includes */
 
@@ -111,43 +111,41 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 
-  csn_high();
-  ce_high();
+  writeCSNHIGH();
+  writeCEHIGH();
 
   HAL_Delay(5);
 
-  ce_low();
+  writeCELOW();
 
-  nrf24_init();
+  nrf24Init();
 
-  nrf24_stop_listen();
+  nrf24EnableAutoAckOnAllPipes(auto_ack);
+  nrf24EnableAckPayload(disable);
+  nrf24EnableDynamicPayload(disable);
 
-  nrf24_auto_ack_all(auto_ack);
-  nrf24_en_ack_pld(disable);
-  nrf24_dpl(disable);
+  nrf24SetCRC(no_crc, _1byte);
 
-  nrf24_set_crc(no_crc, _1byte);
+  nrf24SetTXPower(_0dbm);
+  nrf24SetDataRate(_1mbps);
+  nrf24SetChannel(90);
+  nrf24SetAddressWidth(5);
 
-  nrf24_tx_pwr(_0dbm);
-  nrf24_data_rate(_1mbps);
-  nrf24_set_channel(90);
-  nrf24_set_addr_width(5);
+  nrf24SetRXDynamicPayloadPipe(0, disable);
+  nrf24SetRXDynamicPayloadPipe(1, disable);
+  nrf24SetRXDynamicPayloadPipe(2, disable);
+  nrf24SetRXDynamicPayloadPipe(3, disable);
+  nrf24SetRXDynamicPayloadPipe(4, disable);
+  nrf24SetRXDynamicPayloadPipe(5, disable);
 
-  nrf24_set_rx_dpl(0, disable);
-  nrf24_set_rx_dpl(1, disable);
-  nrf24_set_rx_dpl(2, disable);
-  nrf24_set_rx_dpl(3, disable);
-  nrf24_set_rx_dpl(4, disable);
-  nrf24_set_rx_dpl(5, disable);
+  nrf24SetPipePayloadSize(0, PLD_S);
 
-  nrf24_pipe_pld_size(0, PLD_S);
+  nrf24SetAutoRetransmissionDelay(4);
+  nrf24SetAutoRetransmissionLimit(10);
 
-  nrf24_auto_retr_delay(4);
-  nrf24_auto_retr_limit(10);
-
-  nrf24_open_tx_pipe(tx_addr);
-  nrf24_open_rx_pipe(0, tx_addr);
-  ce_high();
+  nrf24OpenTXPipe(tx_addr);
+  nrf24OpenRXPipe(0, tx_addr);
+  writeCEHIGH();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -163,9 +161,9 @@ int main(void)
 
 	HAL_ADC_Stop(&hadc1);
 
-    nrf24_type_to_uint8_t(data, dataT, sizeof(data));
+    nrf24ConvertTypeToUint8Array(data, dataT, sizeof(data));
 
-    uint8_t val = nrf24_transmit(dataT, sizeof(dataT));
+    uint8_t val = nrf24TransmitData(dataT, sizeof(dataT));
 
 	char tmp[30];
 	sprintf(tmp, "| val= %d | \r\n", val);

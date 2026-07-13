@@ -1,7 +1,7 @@
 /**
    @file nrf24_registers.h
 
-   @brief nRF24L01+ registers, addresses, and bit positions
+   @brief nRF24L01+ registers, addresses, commands, and bit positions
 
    You can configure and control the radio by accessing the register map through the SPI.
 
@@ -9,7 +9,7 @@
 
    @see docs\nRF24L01P_Product_Specification_1_0.pdf
 
-   Pages: 57-63
+   Pages: 51, 57-63
 
 */
 
@@ -296,7 +296,7 @@
    1: TX FIFO full.
    0: Available locations in TX FIFO.
 */
-#define TX_FULL 0
+#define STATUS_TX_FULL 0
 
 /**********************************OBSERVE_TX**********************************/
 #define OBSERVE_TX 0x08 // Transmit observe register
@@ -516,7 +516,7 @@
    1: TX FIFO full.
    0: Available locations in TX FIFO.
 */
-#define TX_FULL 5
+#define FIFO_STATUS_TX_FULL 5
 
 /**
    TX FIFO empty flag.
@@ -642,4 +642,115 @@
 */
 #define EN_DYN_ACK 0
 
+/**********************************COMMANDS************************************/
+
+/**
+   Command word: 000A AAAA
+   # Data bytes: 1 to 5
+   LSByte first
+   Read command and status registers.
+   AAAAA = 5 bit Register Map Address
+*/
+#define R_REGISTER 0b00000000
+
+/**
+   Command word: 001A AAAA
+   # Data bytes: 1 to 5
+   LSByte first
+   Write command and status registers.
+   AAAAA = 5 bit Register Map Address
+   Executable in power down or standby modes only.
+*/
+#define W_REGISTER 0b00100000
+
+/**
+   Command word: 0110 0001
+   # Data bytes: 1 to 32
+   LSByte first
+   Read RX-payload: 1 – 32 bytes.
+   A read operation always starts at byte 0.
+   Payload is deleted from FIFO after it is read.
+   Used in RX mode.
+*/
+#define R_RX_PAYLOAD 0b01100001
+
+/**
+   Command word: 10100000
+   # Data bytes: 1 to 32
+   LSByte first
+   Write TX-payload: 1 – 32 bytes.
+   A write operation always starts at byte 0 used in TX payload.
+*/
+#define W_TX_PAYLOAD 0b10100000
+
+/**
+   Command word: 1110 0001
+   # Data bytes: 0
+   Flush TX FIFO, used in TX mode
+*/
+#define FLUSH_TX 0b11100001
+
+/**
+   Command word: 1110 0010
+   # Data bytes: 0
+   Flush RX FIFO, used in RX mode
+   Should not be executed during transmission of acknowledge, that is, acknowledge package will not be completed
+*/
+#define FLUSH_RX 0b11100010
+
+/**
+   Command word: 1110 0011
+   # Data bytes: 0
+   Used for a PTX device
+   Reuse last transmitted payload.
+   TX payload reuse is active until W_TX_PAYLOAD or FLUSH TX is executed.
+   TX payload reuse must not be activated or deactivated during package transmission.
+*/
+#define REUSE_TX_PL 11100011
+
+/**
+   Command word: 0110 0000
+   # Data bytes: 1
+   Read RX payload width for the top
+   R_RX_PAYLOAD in the RX FIFO.
+   Note: Flush RX FIFO if the read value is larger than 32 bytes.
+
+   The bits in the FEATURE register shown in Table 28. on page 63 have to be set.
+*/
+#define R_RX_PL_WID 0b01100000
+
+/**
+   Command word: 1010 1PPP
+   # Data bytes: 1 to 32
+   LSByte first
+   Used in RX mode.
+   Write Payload to be transmitted together with ACK packet on PIPE PPP.
+   (PPP valid in the range from 000 to 101).
+   Maximum three ACK packet payloads can be pending.
+   Payloads with same PPP are handled using first in - first out principle.
+   Write payload: 1– 32 bytes.
+   A write operation always starts at byte 0.
+
+   The bits in the FEATURE register shown in Table 28. on page 63 have to be set.
+*/
+#define W_ACK_PAYLOAD 0b10101000
+
+/**
+   Command word: 1011 0000
+   # Data bytes: 1 to 32
+   LSByte first
+   Used in TX mode.
+   Disables AUTOACK on this specific packet.
+
+   The bits in the FEATURE register shown in Table 28. on page 63 have to be set.
+*/
+#define W_TX_PAYLOAD_NOACK 0b10110000
+
+/**
+   Command word: 1111 1111
+   # Data bytes: 0
+   No Operation.
+   Might be used to read the STATUS register
+*/
+#define NOP 0b11111111
 #endif /* NRF24_REGISTERS_H */

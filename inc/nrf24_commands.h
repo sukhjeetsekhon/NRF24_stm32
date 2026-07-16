@@ -3,7 +3,7 @@
 
    @brief Declares the SPI Commands for the NRF24L01+ Radio Module
 
-   @see docs\nRF24L01P_Product_Specification_1_0.pdf
+   @see Embedded\docs\pdf\nRF24L01P_Product_Specification_1_0.pdf
 
    Pages: 50-52
 */
@@ -12,6 +12,9 @@
 #define NRF24_COMMANDS_H
 
 #include "nrf24_registers.h"
+#include "nrf24_config.h"
+#include "stm32_hal.h"
+#include "stm32h7xx_hal_spi.h"
 
 #define COMMAND_WORD_SIZE 1 // bytes
 /* Maximum valid DPL payload width per datasheet Section 7.3.4 */
@@ -75,7 +78,7 @@ void nrf24_read_register(
    uint8_t *status,
    uint8_t *data,
    const uint8_t dataSize
-)
+);
 
 /**
  * @brief  Write 1–5 bytes to an nRF24L01+ register via SPI.

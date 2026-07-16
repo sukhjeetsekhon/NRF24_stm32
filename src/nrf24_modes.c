@@ -194,7 +194,7 @@ HAL_StatusTypeDef nrf24_enter_tx_mode(
    uint8_t           *status
 ) {
    HAL_StatusTypeDef result;
-   uint8_t configValue = 0;   /* ← also: initialise to 0 (see Issue 2) */
+   uint8_t configValue = 0;
 
    result = nrf24_read_register(hspiX, NRF24_REG_CONFIG, status, &configValue, 1);
    if (result != HAL_OK) { return result; }
@@ -207,22 +207,29 @@ HAL_StatusTypeDef nrf24_enter_tx_mode(
    if (result != HAL_OK) { return result; }
 
    /*
-   * Wait for Tstby2a — PLL settling time before CE can be asserted.
+   * Wait for Tstby2a — PLL settling time.
    * Per datasheet Table 16: standby → TX mode requires max 130us.
-   * HAL_Delay is ms-resolution; 1ms >> 130us — safe upper bound.
-   *
-   * TODO: replace with microsecond TIM-based delay for tighter timing.
    */
    HAL_Delay(NRF24_DELAY_STBY2A_MS);
 
    /*
-   * Pulse CE >= 10us to initiate transmission of one packet.
-   * Per datasheet Section 6.1.5 and Table 16 (Thce >= 10us).
-   * HAL_Delay minimum is 1ms >> 10us — safe upper bound.
+   * !! CALLER MUST perform these steps after this function returns !!
+   *
+   * Per datasheet Section 6.1.5, TX mode requires ALL of:
+   *   1. PWR_UP=1      ← done above
+   *   2. PRIM_RX=0     ← done above
+   *   3. Payload in TX FIFO  ← caller: nrf24_write_tx_payload()
+   *   4. CE pulsed >= 10us   ← caller: GPIO_PIN_SET → delay → GPIO_PIN_RESET
+   *
+   * If CE is pulsed with an empty TX FIFO, the chip enters Standby-II,
+   * NOT TX mode. Load the payload first, then pulse CE.
+   *
+   * Example:
+   *   nrf24_enter_tx_mode(hspi, &status);
+   *   nrf24_write_tx_payload(hspi, &status, payload, size);
+   *   HAL_GPIO_WritePin(CE_PORT, CE_PIN, GPIO_PIN_SET);
+   *   HAL_Delay(1);
+   *   HAL_GPIO_WritePin(CE_PORT, CE_PIN, GPIO_PIN_RESET);
    */
-   HAL_GPIO_WritePin(CE_GPIO_PORT, CE_GPIO_PIN, GPIO_PIN_SET);
-   HAL_Delay(NRF24_CE_PULSE_MS);
-   HAL_GPIO_WritePin(CE_GPIO_PORT, CE_GPIO_PIN, GPIO_PIN_RESET);
-
    return HAL_OK;
 }

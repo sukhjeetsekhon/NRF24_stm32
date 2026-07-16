@@ -12,7 +12,6 @@
 #define NRF24_COMMANDS_H
 
 #include "nrf24_registers.h"
-#include "nrf24_config.h"
 #include "stm32_hal.h"
 #include "stm32h7xx_hal_spi.h"
 

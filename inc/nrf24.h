@@ -17,6 +17,7 @@
 #include "stm32_hal.h"
 #include "nrf24_config.h"
 #include "nrf24_registers.h"
+#include "stm32h7xx_hal_spi.h"
 
 enum data_rate {
 	_1mbps   = 0,

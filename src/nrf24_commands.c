@@ -62,7 +62,7 @@ void nrf24_read_register(
    * Phase 1: Send command byte, simultaneously receive STATUS register.
    * Blocking call — must complete before Phase 2 begins.
    */
-   HAL_SPI_TransmitReceive(hspiX, &commandWord, status, 1, HAL_MAX_DELAY);
+   HAL_SPI_TransmitReceive(hspiX, &commandWord, status, COMMAND_WORD_SIZE, HAL_MAX_DELAY);
 
    /*
    * Phase 2: Receive register data bytes.
@@ -97,7 +97,7 @@ HAL_StatusTypeDef nrf24_write_register(
       hspiX,
       &commandWord,
       status,
-      1,              /* command word is always exactly 1 byte */
+      COMMAND_WORD_SIZE,              /* command word is always exactly 1 byte */
       HAL_MAX_DELAY
    );
 
@@ -141,7 +141,7 @@ HAL_StatusTypeDef nrf24_read_rx_payload(
       hspiX,
       &commandWord,
       status,
-      1,              /* command word is always exactly 1 byte */
+      COMMAND_WORD_SIZE,              /* command word is always exactly 1 byte */
       HAL_MAX_DELAY
    );
 
@@ -185,7 +185,7 @@ HAL_StatusTypeDef nrf24_write_tx_payload(
       hspiX,
       &commandWord,
       status,
-      1,              /* command word is always exactly 1 byte */
+      COMMAND_WORD_SIZE,              /* command word is always exactly 1 byte */
       HAL_MAX_DELAY
    );
 
@@ -226,7 +226,7 @@ HAL_StatusTypeDef nrf24_flush_tx(
       hspiX,
       &commandWord,
       status,
-      1,              /* command word is always exactly 1 byte */
+      COMMAND_WORD_SIZE,              /* command word is always exactly 1 byte */
       HAL_MAX_DELAY
    );
 
@@ -253,7 +253,7 @@ HAL_StatusTypeDef nrf24_flush_rx(
       hspiX,
       &commandWord,
       status,
-      1,              /* command word is always exactly 1 byte */
+      COMMAND_WORD_SIZE,              /* command word is always exactly 1 byte */
       HAL_MAX_DELAY
    );
 
@@ -280,7 +280,7 @@ HAL_StatusTypeDef nrf24_reuse_tx_pl(
       hspiX,
       &commandWord,
       status,
-      1,              /* command word is always exactly 1 byte */
+      COMMAND_WORD_SIZE,              /* command word is always exactly 1 byte */
       HAL_MAX_DELAY
    );
 
@@ -314,7 +314,7 @@ HAL_StatusTypeDef nrf24_read_rx_pl_wid(
       hspiX,
       &commandWord,
       status,
-      1,              /* command word is always exactly 1 byte */
+      COMMAND_WORD_SIZE,              /* command word is always exactly 1 byte */
       HAL_MAX_DELAY
    );
 
@@ -326,7 +326,7 @@ HAL_StatusTypeDef nrf24_read_rx_pl_wid(
       result = HAL_SPI_Receive(
          hspiX,
          payloadWidth,
-         1,          /* exactly 1 byte — the payload width value */
+         COMMAND_WORD_SIZE,          /* exactly 1 byte — the payload width value */
          HAL_MAX_DELAY
       );
    }
@@ -389,7 +389,7 @@ HAL_StatusTypeDef nrf24_write_ack_payload(
       hspiX,
       &commandWord,
       status,
-      1,              /* command word is always exactly 1 byte */
+      COMMAND_WORD_SIZE,              /* command word is always exactly 1 byte */
       HAL_MAX_DELAY
    );
 
@@ -434,7 +434,7 @@ HAL_StatusTypeDef nrf24_write_tx_no_ack(
       hspiX,
       &commandWord,
       status,
-      1,              /* command word is always exactly 1 byte */
+      COMMAND_WORD_SIZE,              /* command word is always exactly 1 byte */
       HAL_MAX_DELAY
    );
 
@@ -476,7 +476,7 @@ HAL_StatusTypeDef nrf24_nop(
       hspiX,
       &commandWord,
       status,
-      1,              /* command word is always exactly 1 byte */
+      COMMAND_WORD_SIZE,              /* command word is always exactly 1 byte */
       HAL_MAX_DELAY
    );
 

@@ -706,7 +706,7 @@
    TX payload reuse is active until W_TX_PAYLOAD or FLUSH TX is executed.
    TX payload reuse must not be activated or deactivated during package transmission.
 */
-#define REUSE_TX_PL 11100011
+#define REUSE_TX_PL 0b11100011
 
 /**
    Command word: 0110 0000

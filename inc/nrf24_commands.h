@@ -3,7 +3,7 @@
 
    @brief Declares the SPI Commands for the NRF24L01+ Radio Module
 
-   @see Embedded\docs\pdf\nRF24L01P_Product_Specification_1_0.pdf
+   @see docs\nRF24L01P_Product_Specification_1_0.pdf
 
    Pages: 50-52
 */
